@@ -1,10 +1,33 @@
 const { Telegraf, Markup } = require('telegraf');
 const fs = require('fs');
 const fetch = require('node-fetch');
-const sharp = require('sharp');
 
 
 const configFile = JSON.parse(fs.readFileSync(`${__dirname}/config.json`));
+
+
+const telegram = {
+    url: `https://api.telegram.org/bot{{token}}/sendMessage?chat_id={{chatId}}&text=`,
+
+    alert: async function(message){
+        if (configFile.alert.enabled){
+            if (!this.token){
+                this.token = configFile.alert.token;
+                this.chatId = configFile.alert.chatId;
+    
+                this.url = this.url.replace(`{{token}}`, this.token).replace(`{{chatId}}`, this.chatId);
+            }
+            if (typeof message !== 'string'){
+                message = JSON.stringify(message);
+            }
+    
+            const resp = await (await fetch(this.url + encodeURIComponent(message))).json();
+            return resp;
+        }
+        return false;
+    }
+}
+
 
 if (configFile.token === undefined) {
     throw new TypeError('BOT_TOKEN must be provided!');
@@ -83,6 +106,8 @@ bot.command('add', async (ctx) => {
             fs.writeFileSync('config.json', JSON.stringify(configFile));
 
             ctx.replyWithHTML(`🦉\nIt is done! Now that we know each other better, I can take this group's requests more seriously.`);
+
+            telegram.alert(`A new group started to use Owlracle bot: ${args[0]}. Total: ${Object.keys(configFile.groups).length}`);
             return;
         }
 
@@ -141,3 +166,5 @@ bot.launch();
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
+telegram.alert('Bot started');
