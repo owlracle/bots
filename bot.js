@@ -111,11 +111,34 @@ bot.command('add', async (ctx) => {
             return;
         }
 
-        ctx.replyWithHTML(`🦉\nSorry! I am already working at this group.⚒️ If you want to replace your API key you should contact my master at <a href="https://t.me/owlracle">Owlracle's group</a>.`);
+        ctx.replyWithHTML(`🦉\nSorry! I am already working at this group.🛠️ If you want to replace your API key you should use /remove then /add again. You can contact us at <a href="https://t.me/owlracle">Owlracle's group</a> for further help.`);
         return;
     }
 
     ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. But it is simple: <code>/add CHATID APIKEY</code>.`);
+});
+
+
+bot.command('remove', async (ctx) => {
+    const args = ctx.update.message.text.split(' ').slice(1);
+    if (args && args.length == 2){
+
+        // erase group record
+        if (configFile.groups[args[0]] && configFile.groups[args[0]] == args[1]){
+            delete configFile.groups[args[0]];
+            fs.writeFileSync('config.json', JSON.stringify(configFile));
+
+            ctx.replyWithHTML(`🦉\nIt is done! I am no longer working for your group. 😢 I was good while it lasted though.\nIf you change your mind, you can /add me again.`);
+
+            telegram.alert(`A group stopped using Owlracle bot: ${args[0]}. Total: ${Object.keys(configFile.groups).length}`);
+            return;
+        }
+
+        ctx.replyWithHTML(`🦉\nSorry! I am not working for the group you informed, or the API key you provided does not match the group. Check this information and try again, or contact us at <a href="https://t.me/owlracle">Owlracle's group</a> for further help.`);
+        return;
+    }
+
+    ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. But it is simple: <code>/remove CHATID APIKEY</code>.`);
 });
 
 
