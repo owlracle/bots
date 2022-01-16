@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "discord.js": "^13.6.0",
     "telegraf": "^4.5.2"
   }
 }

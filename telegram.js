@@ -1,10 +1,7 @@
 const { Telegraf, Markup } = require('telegraf');
 const fs = require('fs');
 const fetch = require('node-fetch');
-
-
-const configFile = JSON.parse(fs.readFileSync(`${__dirname}/config.json`));
-
+const configFile = require('./config.json');
 
 const telegram = {
     url: `https://api.telegram.org/bot{{token}}/sendMessage?chat_id={{chatId}}&text=`,
