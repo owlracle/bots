@@ -1,44 +1,13 @@
 const { Telegraf, Markup } = require('telegraf');
-const fs = require('fs');
 const fetch = require('node-fetch');
-const configFile = require('./config.json');
+const { networkList, alert, config } = require('./utils.js');
 
-const telegram = {
-    url: `https://api.telegram.org/bot{{token}}/sendMessage?chat_id={{chatId}}&text=`,
-
-    alert: async function(message){
-        if (configFile.alert.enabled){
-            if (!this.token){
-                this.token = configFile.alert.token;
-                this.chatId = configFile.alert.chatId;
-    
-                this.url = this.url.replace(`{{token}}`, this.token).replace(`{{chatId}}`, this.chatId);
-            }
-            if (typeof message !== 'string'){
-                message = JSON.stringify(message);
-            }
-    
-            const resp = await (await fetch(this.url + encodeURIComponent(message))).json();
-            return resp;
-        }
-        return false;
-    }
-}
-
+const configFile = config.get('telegram');
 
 if (configFile.token === undefined) {
     throw new TypeError('BOT_TOKEN must be provided!');
 }
 
-const networkList = {
-    eth: 'Ethereum',
-    bsc: 'BSC',
-    poly: 'Polygon',
-    ftm: 'Fantom',
-    avax: 'Avalanche',
-    movr: 'Moonriver',
-    cro: 'Cronos',
-};
 
 const buttonArray = Object.entries(networkList).map(([k,v]) => Markup.button.callback(v, k));
 const buttons = Markup.inlineKeyboard([buttonArray.slice(0,4), buttonArray.slice(-3)]);
@@ -100,11 +69,11 @@ bot.command('add', async (ctx) => {
             }
 
             configFile.groups[args[0]] = args[1];
-            fs.writeFileSync('config.json', JSON.stringify(configFile));
+            config.set('telegram', configFile);
 
             ctx.replyWithHTML(`🦉\nIt is done! Now that we know each other better, I can take this group's requests more seriously.`);
 
-            telegram.alert(`A new group started to use Owlracle bot: ${args[0]}. Total: ${Object.keys(configFile.groups).length}`);
+            alert.send(`A new group started to use Telegram Owlracle bot: ${args[0]}. Total: ${Object.keys(configFile.groups).length}`);
             return;
         }
 
@@ -123,11 +92,11 @@ bot.command('remove', async (ctx) => {
         // erase group record
         if (configFile.groups[args[0]] && configFile.groups[args[0]] == args[1]){
             delete configFile.groups[args[0]];
-            fs.writeFileSync('config.json', JSON.stringify(configFile));
+            config.set('telegram', configFile);
 
-            ctx.replyWithHTML(`🦉\nIt is done! I am no longer working for your group. 😢 I was good while it lasted though.\nIf you change your mind, you can /add me again.`);
+            ctx.replyWithHTML(`🦉\nIt is done! I am no longer working for your group. 😢 It was good while it lasted though.\nIf you change your mind, you can /add me again.`);
 
-            telegram.alert(`A group stopped using Owlracle bot: ${args[0]}. Total: ${Object.keys(configFile.groups).length}`);
+            alert.send(`A group stopped using Telegram Owlracle bot: ${args[0]}. Total: ${Object.keys(configFile.groups).length}`);
             return;
         }
 
@@ -165,10 +134,10 @@ bot.command('gas', (ctx) => {
             return;
         }
 
-        await ctx.replyWithHTML(`🦉\nI think you should pay no more than this for submitting transactions on the <b>${v}</b> network:`);
+        await ctx.replyWithHTML(`🦉\nI think you should pay no more than this when submitting transactions on the <b>${v}</b> network:`);
         
-        const speeds = ['🚲 Slow', '🚗 Standard', '✈️ Fast', '🚀 Instant'];
-        await Promise.all(speeds.map((e,i) => ctx.replyWithHTML(`\n<b>${e}</b>\n\n⛽ <b>${gas.speeds[i].gasPrice.toFixed(2)}</b> GWei\n 💰$<b>${gas.speeds[i].estimatedFee.toFixed(2)}</b>\n\n`)));
+        const speeds = ['🛴 Slow', '🚗 Standard', '✈️ Fast', '🚀 Instant'];
+        await Promise.all(speeds.map((e,i) => ctx.replyWithHTML(`\n<b>${e}</b>\n\n<b>${gas.speeds[i].gasPrice.toFixed(2)}</b> GWei\n$ <b>${gas.speeds[i].estimatedFee.toFixed(2)}</b>\n\n`)));
         
         ctx.replyWithHTML(`🦉\nUse this information wisely. And don't forget to <a href="https://owlracle.info">visit me</a> if you want further knowledge.`);
     }));
@@ -187,4 +156,4 @@ bot.launch();
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
-telegram.alert('Bot started');
+alert.send('Telegram Bot started');
