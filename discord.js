@@ -177,7 +177,7 @@ client.on('interactionCreate', async itr => {
     }});
 
     const blankComponenet = { name: '\u200b', value: '\u200b', inline: true };
-    templateEmbed.fields = [templateEmbed.fields[1], blankComponenet, ...templateEmbed.fields.slice(2,4), blankComponenet, templateEmbed.fields.slice(-1)];
+    templateEmbed.fields = [templateEmbed.fields[0], blankComponenet, ...templateEmbed.fields.slice(1,3), blankComponenet, templateEmbed.fields.slice(-1)];
     
     await itr.editReply({ 
         content: `🦉\nI think you should pay no more than this for submitting transactions on the **${ntw}** network:`,
