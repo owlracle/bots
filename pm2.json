@@ -1,0 +1,14 @@
+{
+    "apps" : [
+        {
+            "name"        : "telegram_bot",
+            "script"      : "./telegram.js",
+            "args"        : ""
+        },
+        {
+            "name"        : "discord_bot",
+            "script"      : "./discord.js",
+            "args"        : ""
+        }
+    ]
+}

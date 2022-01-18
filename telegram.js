@@ -137,7 +137,7 @@ bot.command('gas', (ctx) => {
         await ctx.replyWithHTML(`🦉\nI think you should pay no more than this when submitting transactions on the <b>${v}</b> network:`);
         
         const speeds = ['🛴 Slow', '🚗 Standard', '✈️ Fast', '🚀 Instant'];
-        await Promise.all(speeds.map((e,i) => ctx.replyWithHTML(`\n<b>${e}</b>\n\n<b>${gas.speeds[i].gasPrice.toFixed(2)}</b> GWei\n$ <b>${gas.speeds[i].estimatedFee.toFixed(2)}</b>\n\n`)));
+        await Promise.all(speeds.map((e,i) => ctx.replyWithHTML(`\n<b>${e}</b>\n\n<b>${gas.speeds[i].gasPrice.toFixed(2)}</b> GWei\n$ <b>${gas.speeds[i].estimatedFee.toFixed(4)}</b>\n\n`)));
         
         ctx.replyWithHTML(`🦉\nUse this information wisely. And don't forget to <a href="https://owlracle.info">visit me</a> if you want further knowledge.`);
     }));
