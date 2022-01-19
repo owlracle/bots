@@ -88,7 +88,7 @@ Now you can interact with your bot. Invite him to one of your groups and start i
 That is it! Enjoy.
 
 
-# Owlrcle's Discord Bot <a name="discord"></a>
+# Owlracle's Discord Bot <a name="discord"></a>
 
 <p align="center"><img src="https://user-images.githubusercontent.com/19828711/150152065-6871062f-598a-47c8-a271-77f405efd949.png"></p>
 
@@ -110,7 +110,7 @@ After your bot is running, you can start talking to him with `!start` or `/start
 
 That is it! Enjoy.
 
-# Owlrcle's Twitter Bot <a name="twitter"></a>
+# Owlracle's Twitter Bot <a name="twitter"></a>
 
 Soon! Stay tuned. 👀
 
