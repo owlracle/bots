@@ -9,6 +9,11 @@
             "name"        : "discord_bot",
             "script"      : "./discord.js",
             "args"        : ""
+        },
+        {
+            "name"        : "twitter_bot",
+            "script"      : "./twitter.js",
+            "args"        : ""
         }
     ]
 }

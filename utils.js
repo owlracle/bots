@@ -56,4 +56,34 @@ const alert = {
     }
 }
 
-module.exports = { networkList, alert, config };
+
+// save to text log errors
+const logError = (data) => {
+    try {
+        data.timestamp = new Date().toISOString();
+
+        if (data.alert !== false){
+            alert.send(data);
+        }
+        
+        if (data.console !== false){
+            console.log(data);
+        }
+        
+        delete data.alert;
+        delete data.console;
+
+        const log = JSON.parse(fs.readFileSync(`${__dirname}/log.json`));
+        log.push(data);
+        fs.writeFileSync(`${__dirname}/log.json`, JSON.stringify(log));
+
+        return true;
+    }
+    catch (error) {
+        console.log(error)
+        return false;
+    }
+}
+
+
+module.exports = { networkList, alert, config, logError };
