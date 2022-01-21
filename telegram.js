@@ -146,7 +146,9 @@ bot.command('gas', (ctx) => {
 
 // when user send a dm
 bot.on('message', (ctx) => {
-    ctx.replyWithHTML(`🦉\nThanks for reaching out. Currently, I am not very capable of making complex conversations.🤖 But one thing I am very good at is predicting <b>gas prices</b>.⛽\n\nType /gas and just try me.`);
+    if (ctx.update.message.chat.type == 'private'){
+        ctx.replyWithHTML(`🦉\nThanks for reaching out. Currently, I am not very capable of making complex conversations.🤖 But one thing I am very good at is predicting <b>gas prices</b>.⛽\n\nType /gas and just try me.`);
+    }
 });
 
 

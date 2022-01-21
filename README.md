@@ -2,6 +2,7 @@
 <img width="800" src="https://user-images.githubusercontent.com/19828711/140464079-683afdb2-a213-4e02-a032-93a42e3a93e8.png">
 </p>
 
+
 # Owlracle Bots
 
 This is Owlracle's repo for his bots. All the bots serve a key function in the Owlracle ecossystem, delivering gas prices to different platforms using Owlracle's API.
@@ -9,64 +10,28 @@ This is Owlracle's repo for his bots. All the bots serve a key function in the O
 
 # Table of Contents
 
-1. [Telegram Bot](#telegram)
-2. [Discord Bot](#discord)
-3. [Twitter Bot](#twitter)
-4. [Config File](#config)
+1. [Install](#install)
+2. [Telegram Bot](#telegram)
+3. [Discord Bot](#discord)
+4. [Twitter Bot](#twitter)
 5. [Contact and Support](#contact)
 
 ---
 
+# Install the bots <a name="install"></a>
 
-# Owlracle's Telegram Bot <a name="telegram"></a>
-
-<p align="center"><img src="https://user-images.githubusercontent.com/19828711/149681259-ebadaf9f-f01a-497a-95cc-698d51c21563.png"></p>
-
-## Install
-
-Clone the repo
+All bots come with the same repo. Before getting any of them to work, you must first clone the repo
 
 ```
 git clone https://github.com/owlracle/telegram_bot.git
 ```
 
-Go to the dir, then install dependencies
+Then go to the dir, then install dependencies
 ```
 npm init
 ```
 
-You must have created a Telegram bot. For more information about this, check [Telegram docs](https://core.telegram.org/bots).
-
-## Usage
-
-You must have a `config.json` setup before running your bot. Check [config section](#config) for more information about it.
-
-Run the bot:
-
-```
-node telegram.js
-```
-
-Now you can interact with your bot. Invite him to one of your groups and start interacting with him:
-
-```
-\start
-```
-
-That is it! Enjoy.
-
-
-# Owlrcle's Discord Bot <a name="discord"></a>
-
-
-# Owlrcle's Twitter Bot <a name="twitter"></a>
-
-Soon! Stay tuned. 👀
-
-
-# Config File <a name="config"></a>
-
-All of Owlracle's bots share the same `config.json` file. You must create this file on repo root with the following format:
+All of Owlracle's bots in this repo share the same `config.json` file. You must create this file on repo root with the following format:
 
 ```
 {
@@ -96,6 +61,59 @@ All of Owlracle's bots share the same `config.json` file. You must create this f
   * **enabled**: If set to _true_, you will receive telegram alerts.
   * **token**: The token for the Telegram bot that will send you the alerts. This is not the same Owlralce Telegram bot we will use for gas prices.
   * **chatId**: This is your personal account chat id (google about it).
+
+After that you are ready to start the bots.
+
+
+# Owlracle's Telegram Bot <a name="telegram"></a>
+
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/150151758-4470fd5b-82ff-4bc2-9a97-13e2719b2630.png"></p>
+
+This repo is about Owlracle Telegram Bot's webhook. Before you must have created a Telegram bot. For more information about this, check [Telegram docs](https://core.telegram.org/bots).
+
+## Usage
+
+Run the bot:
+
+```
+node telegram.js
+```
+
+Now you can interact with your bot. Invite him to one of your groups and start interacting with him:
+
+```
+\start
+```
+
+That is it! Enjoy.
+
+
+# Owlracle's Discord Bot <a name="discord"></a>
+
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/150152065-6871062f-598a-47c8-a271-77f405efd949.png"></p>
+
+This repo deals with the Owlracle Discord Bot webhook. Before running your bot you must have create it. Go to [Discord's dev portal](https://discord.com/developers/applications) and create your bot. Look at some resources [like this](https://www.freecodecamp.org/news/create-a-discord-bot-with-python/) as to how to do it properly.
+
+
+## Usage
+
+
+Run the bot:
+
+```
+node discord.js
+```
+
+Now your bot must be added to the desired server. If you followed a tutorial on how to make a discord bot, you know what this is about.
+After your bot is running, you can start talking to him with `!start` or `/start`.
+
+
+That is it! Enjoy.
+
+# Owlracle's Twitter Bot <a name="twitter"></a>
+
+Soon! Stay tuned. 👀
+
 
 ---
 
