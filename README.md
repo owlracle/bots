@@ -122,8 +122,10 @@ node discord.js
 Now your bot must be added to the desired server. If you followed a tutorial on how to make a discord bot, you know what this is about.
 After your bot is running, you can start talking to him with `!start` or `/start`.
 
+You can test it on [Owlracle's Telegram](https://t.me/owlracle) group. Just join.
 
 That is it! Enjoy.
+
 
 # Owlracle's Twitter Bot <a name="twitter"></a>
 
@@ -156,7 +158,7 @@ Now the bot will fetch gas prices using Owlracle API and tweet a reply to whoeve
 
 Check a sample tweet in the [image](#twitter) above.
 
-You can also test it sending a tweet to [@owlracleapi](https://twitter.com/owlraclepi).
+You can also test it sending a tweet to [@owlracleapi](https://twitter.com/owlracleapi).
 
 
 That is it! Enjoy.
