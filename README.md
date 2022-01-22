@@ -122,7 +122,7 @@ node discord.js
 Now your bot must be added to the desired server. If you followed a tutorial on how to make a discord bot, you know what this is about.
 After your bot is running, you can start talking to him with `!start` or `/start`.
 
-You can test it on [Owlracle's Telegram](https://t.me/owlracle) group. Just join.
+You can test it on [Owlracle's Telegram](https://t.me/owlracle) group.
 
 That is it! Enjoy.
 
