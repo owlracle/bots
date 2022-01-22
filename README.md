@@ -43,6 +43,14 @@ All of Owlracle's bots in this repo share the same `config.json` file. You must 
         "token": "DISCORD_BOT_TOKEN",
         "groups": {}
     },
+    "twitter": {
+        "apiKey": "TWITTER_CONSUMER_API_KEY",
+        "secret": "TWITTER_CONSUMER_API_SECRET",
+        "bearer": "TWITTER_AUTHENTICATION_BEARER_TOKEN",
+        "access": "TWITTER_AUTHENTICATION_ACCESS_TOKEN",
+        "accessSecret": "TWITTER_AUTHENTICATION_ACCESS_SECRET",
+        "owlracleKey": "OWLRACLE_API_KEY"
+    },
     "alert": {
         "enabled": false,
         "token": "TELEGRAM_ALERT_BOT_TOKEN",
@@ -57,6 +65,13 @@ All of Owlracle's bots in this repo share the same `config.json` file. You must 
 * **discord**: Information about your Discord bot setup.
   * **token**: The _DISCORD_BOT_TOKEN_ is taken from Discord service when you create your bot. For instructions about how to set a new bot, refer to the [discord.js docs](https://discordjs.guide/).
   * **groups**: Object that will be filled when Discord servers add your bot.
+* **twitter**: Information about your Twitter bot setup.
+  * **apiKey**: The _TWITTER_CONSUMER_API_KEY_ and all other tokens can be generated on Tweeter Developer Portal. Know more about it at [Twitter API docs](https://developer.twitter.com/).
+  * **secret**: The _TWITTER_CONSUMER_API_SECRET_ is generated at the same time as _TWITTER_CONSUMER_API_KEY_.
+  * **bearer**: The _TWITTER_AUTHENTICATION_BEARER_TOKEN_ Is used to identify your application. See **apiKey** above.
+  * **access**: The _TWITTER_AUTHENTICATION_ACCESS_TOKEN_ is used to get authorization to post a tweet. See **apiKey** above.
+  * **accessSecret**: The _TWITTER_AUTHENTICATION_ACCESS_SECRET_ is generated together with _TWITTER_AUTHENTICATION_ACCESS_TOKEN_. See **apiKey** above.
+  * **owlracleKey**: Whoever running this bot must provide an Owlracle API key. You can generate one [here](http://owlracle.info/?action=newkey).
 * **alert**: This is used to receive alerts from your bot on your personal Telegram.
   * **enabled**: If set to _true_, you will receive telegram alerts.
   * **token**: The token for the Telegram bot that will send you the alerts. This is not the same Owlralce Telegram bot we will use for gas prices.
@@ -112,7 +127,39 @@ That is it! Enjoy.
 
 # Owlracle's Twitter Bot <a name="twitter"></a>
 
-Soon! Stay tuned. 👀
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/150651509-0b947e03-0c90-40eb-812c-f9da7e37527d.png"></p>
+
+This repo deals with the Owlracle Twitter Bot webhook. You will tie your bot's logic with an existing Twitter account. Check their [docs](https://developer.twitter.com/en/docs) to know more about their API. The tokens provided in `config.json` will bound the bot with the account.
+
+
+## Usage
+
+
+Run the bot:
+
+```
+node twitter.js
+```
+
+Now the bot will fetch gas prices using Owlracle API and tweet a reply to whoever make a tweet containing the following:
+
+* A mention to the bot's bound profile.
+* The hashtag `#gas`.
+* A reference to any supported network. Any of the following will work:
+  * **BSC**: _bsc_, _bnb_, _binance_.
+  * **Polygon**: _poly_, _matic_, _polygon_.
+  * **Fantom**: _ftm_, _fantom_.
+  * **Avalanche**: _avax_, _avalanche_.
+  * **Ethereum**: _eth_, _ethereum_.
+  * **Moonriver**: _movr_, _moonriver_.
+  * **Cronos**: _cro_, _moonriver_.
+
+Check a sample tweet in the [image](#twitter) above.
+
+You can also test it sending a tweet to [@owlracleapi](https://twitter.com/owlraclepi).
+
+
+That is it! Enjoy.
 
 
 ---
