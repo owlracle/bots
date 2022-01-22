@@ -5,6 +5,26 @@ const { TwitterApi } = require('twitter-api-v2');
 const configFile = config.get('twitter');
 
 
+const args = {
+    aggressive: false,
+    rebuildRules: false,
+};
+
+process.argv.forEach((val, index, array) => {
+    // aggressive mode = do not require mention
+    if ((val == '-a' || val == '--aggressive')){
+        args.aggressive = true;
+    }
+    // rebuild rules
+    if ((val == '-r')){
+        const m = array.match(/-r "(.+)"/);
+        if (m && m.length > 1){
+            args.rebuildRules = m[1];
+        }
+    }
+});
+
+
 const api = {
     botName: 'owlracleapi',
     callerTag: 'gas',
@@ -17,8 +37,22 @@ const api = {
             accessSecret: configFile.accessSecret,
         });
 
-        // await this.rules.clear();
-        // await this.rules.add(`@${this.botName} #${this.callerTag}`);
+        let rules = `@${this.botName} #${this.callerTag}`;
+        if (args.aggressive) {
+            rules = this.callerTag;
+        }
+        if (args.rebuildRules) {
+            rules = args.rebuildRules;
+        }
+        
+        const rulesObj = await this.rules.get();
+        
+        if (rulesObj.data[0].value != rules){
+            console.log('Updating rules');
+            await this.rules.clear();
+            await this.rules.add(rules);
+        }
+        
         console.log(await this.rules.get());
         await this.scan();
     },
@@ -89,11 +123,6 @@ const api = {
                 const network = this.findNetwork(tweet);
                 if (!network){
                     logError({ message: 'Provided network is not available', network: parts[2], alert: false });
-                    return;
-                }
-
-                if (!(tweet.match(`@${this.botName}`) && tweet.match(`#${this.callerTag}`))){
-                    logError({ message: 'Tweet is not in the right format', alert: false });
                     return;
                 }
 

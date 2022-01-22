@@ -1,5 +1,4 @@
 const { Client, Intents } = require('discord.js');
-const fs = require('fs');
 const { config, networkList, alert } = require('./utils.js');
 const fetch = require('node-fetch');
 
@@ -85,7 +84,7 @@ client.on('messageCreate',async msg => {
 
         msg.reply(`🦉\nIt is done! Now that we know each other better, I can take this group's requests more seriously.`);
 
-        alert.send(`A new discord group started to use Discord Owlracle bot: ${args[0]}. Total: ${Object.keys(configFile.groups).length}`);
+        alert.send(`A new discord group started to use Discord Owlracle bot: ${args[1]}. Total: ${Object.keys(configFile.groups).length}`);
         return;
     }
 
