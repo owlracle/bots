@@ -13,12 +13,14 @@ const args = {
 process.argv.forEach((val, index, array) => {
     // aggressive mode = do not require mention
     if ((val == '-a' || val == '--aggressive')){
+        console.log('Aggressive mode - Bot will not care about mention and hashtag when searching for tweets.')
         args.aggressive = true;
     }
     // rebuild rules
     if ((val == '-r')){
         const m = array.match(/-r "(.+)"/);
         if (m && m.length > 1){
+            console.log(`Custom rules - Bot will use this rule when searching for tweets: ${m[1]}`);
             args.rebuildRules = m[1];
         }
     }
@@ -27,7 +29,11 @@ process.argv.forEach((val, index, array) => {
 
 const api = {
     botName: 'owlracleapi',
-
+    callsReceived: {
+        lastReport: new Date().getTime(),
+        count: 0,
+    },
+    
     networkAlias: {
         bsc: [ 'bsc', 'bnb', 'binance' ],
         poly: [ 'poly', 'matic', 'polygon' ],
@@ -190,7 +196,14 @@ const api = {
         
         try {
             this.client.v2.reply(message, id);
-            logError({ id: id, message: message, alert: true });
+
+            // report every 24h
+            this.callsReceived.count++;
+            if (callsReceived.lastReport <= new Date().getTime() - 1000*3600*24){
+                logError({ message: `${new Date().toISOString()}: ${this.callsReceived.count} Calls since last day`, alert: true });
+                this.callsReceived.count = 0;
+            }
+            // logError({ id: id, message: message, alert: true });
         }
         catch (error) {
             console.log(error);
