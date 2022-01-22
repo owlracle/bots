@@ -27,7 +27,16 @@ process.argv.forEach((val, index, array) => {
 
 const api = {
     botName: 'owlracleapi',
-    callerTag: 'gas',
+
+    networkAlias: {
+        bsc: [ 'bsc', 'bnb', 'binance' ],
+        poly: [ 'poly', 'matic', 'polygon' ],
+        ftm: [ 'ftm', 'fantom' ],
+        eth: [ 'eth', 'ethereum' ],
+        avax: [ 'avax', 'avalanche' ],
+        cro: [ 'cro', 'cronos' ],
+        movr: [ 'movr', 'moonriver' ],
+    },
 
     init: async function() {
         this.client = new TwitterApi({
@@ -37,20 +46,23 @@ const api = {
             accessSecret: configFile.accessSecret,
         });
 
-        let rules = `@${this.botName} #${this.callerTag}`;
+        const mainRule = `@${this.botName} #gas`;
+        let newRule = mainRule;
         if (args.aggressive) {
-            rules = this.callerTag;
+            const aliases = Object.values(this.networkAlias).map(n => n.map(a => `"${a}"`).join(' OR ')).join(' OR ');
+            newRule = `-from:${this.botName} ("gas price" OR "gas prices" OR #gas OR #GasPrice OR #gasprices) (${aliases})`;
         }
         if (args.rebuildRules) {
-            rules = args.rebuildRules;
+            newRule = args.rebuildRules;
         }
         
         const rulesObj = await this.rules.get();
         
-        if (rulesObj.data[0].value != rules){
+        if (rulesObj.data[0].value != newRule){
             console.log('Updating rules');
             await this.rules.clear();
-            await this.rules.add(rules);
+            await this.rules.add(newRule);
+            await this.rules.add(mainRule);
         }
         
         console.log(await this.rules.get());
@@ -144,19 +156,9 @@ const api = {
     },
 
     findNetwork: function(text){
-        const networkAlias = {
-            bsc: [ 'bsc', 'bnb', 'binance' ],
-            poly: [ 'poly', 'matic', 'polygon' ],
-            ftm: [ 'ftm', 'fantom' ],
-            eth: [ 'eth', 'ethereum' ],
-            avax: [ 'avax', 'avalanche' ],
-            cro: [ 'cro', 'cronos' ],
-            movr: [ 'movr', 'moonriver' ],
-        };
-        
         // try to find inside text any of the aliases from each network
-        const network = Object.entries(networkAlias).map(([k,v]) => {
-            const kwRegex = new RegExp(`(${ v.join(')|(?:') })`, 'g');
+        const network = Object.entries(this.networkAlias).map(([k,v]) => {
+            const kwRegex = new RegExp(`(?:[\\W\\s]+${ v.join('[\\W\\s]+)|(?:[\\W\\s]+') }[\\W\\s]+)`, 'g');
             const matches = text.match(kwRegex);
             return matches ? k : false;
         }).filter(e => e);
@@ -184,7 +186,7 @@ const api = {
 
         message = speeds.map((e,i) => `${e}: ${message.speeds[i].gasPrice.toFixed(2)} GWei ≈ $ ${message.speeds[i].estimatedFee.toFixed(4)}`).join('\n');
         
-        message = `⛽${network} Gas Price\n\n${message}\n\nFetched from owlracle.info @ ${time}`;
+        message = `⛽${network} Gas Price\n\n${message}\n\n🦉Fetched from owlracle.info @ ${time}`;
         
         try {
             this.client.v2.reply(message, id);
