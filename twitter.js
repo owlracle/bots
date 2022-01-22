@@ -33,10 +33,10 @@ const api = {
         lastReport: new Date().getTime(),
         count: 0,
     },
-    
+
     networkAlias: {
-        bsc: [ 'bsc', 'bnb', 'binance' ],
-        poly: [ 'poly', 'matic', 'polygon' ],
+        bsc: [ 'bnb', 'bsc', 'binance' ],
+        poly: [ 'matic', 'poly', 'polygon' ],
         ftm: [ 'ftm', 'fantom' ],
         eth: [ 'eth', 'ethereum' ],
         avax: [ 'avax', 'avalanche' ],
@@ -192,7 +192,7 @@ const api = {
 
         message = speeds.map((e,i) => `${e}: ${message.speeds[i].gasPrice.toFixed(2)} GWei ≈ $ ${message.speeds[i].estimatedFee.toFixed(4)}`).join('\n');
         
-        message = `⛽${network} Gas Price\n\n${message}\n\n🦉Fetched from owlracle.info @ ${time}`;
+        message = `⛽${network} Gas Price\n\n${message}\n\n🦉Fetched from owlracle.info @ ${time}\n#GasPrice #${networkList[message.network]} #${this.networkAlias[message.network][0].toUpperCase()}`;
         
         try {
             this.client.v2.reply(message, id);
