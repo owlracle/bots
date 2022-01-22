@@ -164,7 +164,7 @@ const api = {
     findNetwork: function(text){
         // try to find inside text any of the aliases from each network
         const network = Object.entries(this.networkAlias).map(([k,v]) => {
-            const kwRegex = new RegExp(`(?:[\\W\\s]+${ v.join('[\\W\\s]+)|(?:[\\W\\s]+') }[\\W\\s]+)`, 'g');
+            const kwRegex = new RegExp(`(?:${ v.join(')|(?:') })`, 'g');
             const matches = text.match(kwRegex);
             return matches ? k : false;
         }).filter(e => e);
@@ -186,20 +186,23 @@ const api = {
 
     sendMessage: async function(id, message) {
         const network = ( text => text[0].toUpperCase() + text.slice(1).toLowerCase() )(networkList[message.network]);
-        const time = message.timestamp
+        const time = message.timestamp;
+
+        let tags = '';
+        if (networkList[message.network] && this.networkAlias[message.network]){
+            tags = `\n\n#GasPrice #${networkList[message.network]} #${this.networkAlias[message.network][0].toUpperCase()}`;
+        }
 
         const speeds = ['🛴 Slow', '🚗 Standard', '✈️ Fast', '🚀 Instant'];
-
         message = speeds.map((e,i) => `${e}: ${message.speeds[i].gasPrice.toFixed(2)} GWei ≈ $ ${message.speeds[i].estimatedFee.toFixed(4)}`).join('\n');
-        
-        message = `⛽${network} Gas Price\n\n${message}\n\n🦉Fetched from owlracle.info @ ${time}\n#GasPrice #${networkList[message.network]} #${this.networkAlias[message.network][0].toUpperCase()}`;
+        message = `⛽${network} Gas Price\n\n${message}\n\n🦉Fetched from owlracle.info @ ${time}${tags}`;
         
         try {
             this.client.v2.reply(message, id);
 
             // report every 24h
             this.callsReceived.count++;
-            if (callsReceived.lastReport <= new Date().getTime() - 1000*3600*24){
+            if (this.callsReceived.lastReport <= new Date().getTime() - 1000*3600*24){
                 logError({ message: `${new Date().toISOString()}: ${this.callsReceived.count} Calls since last day`, alert: true });
                 this.callsReceived.count = 0;
             }
