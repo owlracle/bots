@@ -49,7 +49,8 @@ All of Owlracle's bots in this repo share the same `config.json` file. You must 
         "bearer": "TWITTER_AUTHENTICATION_BEARER_TOKEN",
         "access": "TWITTER_AUTHENTICATION_ACCESS_TOKEN",
         "accessSecret": "TWITTER_AUTHENTICATION_ACCESS_SECRET",
-        "owlracleKey": "OWLRACLE_API_KEY"
+        "owlracleKey": "OWLRACLE_API_KEY",
+	"blacklist": []
     },
     "alert": {
         "enabled": false,
@@ -72,6 +73,7 @@ All of Owlracle's bots in this repo share the same `config.json` file. You must 
   * **access**: The _TWITTER_AUTHENTICATION_ACCESS_TOKEN_ is used to get authorization to post a tweet. See **apiKey** above.
   * **accessSecret**: The _TWITTER_AUTHENTICATION_ACCESS_SECRET_ is generated together with _TWITTER_AUTHENTICATION_ACCESS_TOKEN_. See **apiKey** above.
   * **owlracleKey**: Whoever running this bot must provide an Owlracle API key. You can generate one [here](http://owlracle.info/?action=newkey).
+  * **blacklist**: List of tweeter users that will not get a reply from Owlracle bot. This list is useful to prevent replying to other bots.
 * **alert**: This is used to receive alerts from your bot on your personal Telegram.
   * **enabled**: If set to _true_, you will receive telegram alerts.
   * **token**: The token for the Telegram bot that will send you the alerts. This is not the same Owlralce Telegram bot we will use for gas prices.
