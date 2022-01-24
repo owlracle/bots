@@ -61,6 +61,9 @@ const api = {
         if (args.rebuildRules) {
             newRule = args.rebuildRules;
         }
+
+        this.blacklist = configFile.blacklist || [];
+        newRule += ' ' + this.blacklist.map(e => `-from:${e}`).join(' ');
         
         const rulesObj = await this.rules.get();
         
@@ -70,7 +73,7 @@ const api = {
             await this.rules.add(newRule);
             await this.rules.add(mainRule);
         }
-        
+
         console.log(await this.rules.get());
         await this.scan();
     },
@@ -205,6 +208,7 @@ const api = {
             if (this.callsReceived.lastReport <= new Date().getTime() - 1000*3600*24){
                 logError({ message: `${new Date().toISOString()}: ${this.callsReceived.count} Calls since last day`, alert: true });
                 this.callsReceived.count = 0;
+                this.callsReceived.lastReport = new Date().getTime();
             }
             // logError({ id: id, message: message, alert: true });
         }
