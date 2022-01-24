@@ -145,10 +145,16 @@ Run the bot:
 node twitter.js
 ```
 
+You could also use any of the optional arguments:
+
+* `-a`: Aggressive mode. This mode will not require the bot to be mentioned, or the hashtag #gas be present in the tweet. Instead, any tweet with the words _gas prices_ or hashtags _#gas_ or _#gasprice_ that contain a network reference will trigger the bot reply.
+* `-r "RULES"`: Custom rules. The bot will run with the rules of your choosing. Refer to the twitter docs to learn about rules formatting.
+
+
 Now the bot will fetch gas prices using Owlracle API and tweet a reply to whoever make a tweet containing the following:
 
-* A mention to the bot's bound profile.
-* The hashtag `#gas`.
+* A mention to the bot's bound profile. Not needed when on aggressive mode.
+* The hashtag `#gas`. When on aggressive mode, other keywords can be used instead.
 * A reference to any supported network. Any of the following will work:
   * **BSC**: _bsc_, _bnb_, _binance_.
   * **Polygon**: _poly_, _matic_, _polygon_.
