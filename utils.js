@@ -31,6 +31,9 @@ const networkList = {
     avax: 'Avalanche',
     movr: 'Moonriver',
     cro: 'Cronos',
+    one: 'Harmony',
+    ht: 'Heco',
+    celo: 'Celo',
 };
 
 

@@ -36,6 +36,9 @@ const api = {
         avax: [ 'avax', 'avalanche' ],
         cro: [ 'cro', 'cronos' ],
         movr: [ 'movr', 'moonriver' ],
+        one: [ 'one', 'harmony' ],
+        ht: [ 'ht', 'huobi', 'heco' ],
+        celo: [ 'celo' ],
     },
 
     init: async function() {

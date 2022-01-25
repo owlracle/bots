@@ -10,7 +10,11 @@ if (configFile.token === undefined) {
 
 
 const buttonArray = Object.entries(networkList).map(([k,v]) => Markup.button.callback(v, k));
-const buttons = Markup.inlineKeyboard([buttonArray.slice(0,4), buttonArray.slice(-3)]);
+const buttons = Markup.inlineKeyboard([
+    buttonArray.slice(0,4),
+    buttonArray.slice(4,7),
+    buttonArray.slice(7)
+]);
 
 const bot = new Telegraf(configFile.token);
 

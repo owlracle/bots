@@ -51,7 +51,8 @@ client.on('messageCreate',async msg => {
             content: `🦉\nHello **${msg.author.username}**. Did you summon me? 🔮\nI can tell you the current **gas prices**.⛽ Just give me the network name:`,
             components: [
                 { type: 1, components: buttons.slice(0,4) },
-                { type: 1, components: buttons.slice(4) },
+                { type: 1, components: buttons.slice(4,7) },
+                { type: 1, components: buttons.slice(7) },
             ]
         });
 
