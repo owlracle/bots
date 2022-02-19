@@ -180,7 +180,7 @@ const api = {
     getGas: async function(network) {
         const apiKey = configFile.owlracleKey;
 
-        const gas = await (await fetch(`https://owlracle.info/${network}/gas?apikey=${apiKey}`)).json();
+        const gas = await (await fetch(`https://owlracle.info/${network}/gas?apikey=${apiKey}&source=bot`)).json();
 
         if (gas.error){
             logError({ message: 'Error retrieving gas', error: gas, apiKey: apiKey, network: network });

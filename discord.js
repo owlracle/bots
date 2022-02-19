@@ -73,7 +73,7 @@ client.on('messageCreate',async msg => {
 
         msg.reply(`🦉\nAllright. I will just check to make sure everything is working as expected...`);
 
-        const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}`)).json();
+        const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}&source=bot`)).json();
 
         if (gas.error) {
             msg.reply(`🦉\nWell... The request I made using the API key you provided returned an error. Check your key and try again.`);
@@ -166,7 +166,7 @@ client.on('interactionCreate', async itr => {
     });
 
     const apiKey = configFile.groups[itr.guildId];
-    const gas = await (await fetch(`https://owlracle.info/${itr.customId}/gas?apikey=${apiKey}`)).json();
+    const gas = await (await fetch(`https://owlracle.info/${itr.customId}/gas?apikey=${apiKey}&source=bot`)).json();
 
     // put information inside the card and update the reply
     const speeds = ['🛴 Slow', '🚗 Standard', '✈️ Fast', '🚀 Instant'];

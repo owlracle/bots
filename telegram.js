@@ -65,7 +65,7 @@ bot.command('add', async (ctx) => {
         if (!configFile.groups[args[0]]){
             ctx.replyWithHTML(`🦉\nAllright. I will just check to make sure everything is working as expected...`);
 
-            const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}`)).json();
+            const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}&source=bot`)).json();
 
             if (gas.error) {
                 ctx.replyWithHTML(`🦉\nWell... The request I made using the API key you provided returned an error. Check your key and try again.`);
@@ -127,7 +127,7 @@ bot.command('gas', (ctx) => {
         
         ctx.replyWithHTML(`🦉\n<b>${v}</b>, good choice! One moment while I perform some calculations... 🧠`);
         
-        const gas = await (await fetch(`https://owlracle.info/${k}/gas?apikey=${apiKey}`)).json();
+        const gas = await (await fetch(`https://owlracle.info/${k}/gas?apikey=${apiKey}&source=bot`)).json();
 
         if (gas.error){
             if (gas.status == 401){
