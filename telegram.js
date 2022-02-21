@@ -20,6 +20,14 @@ const bot = new Telegraf(configFile.token);
 
 // when user type /start
 bot.start((ctx) => {
+    let args = ctx.update.message.text.split(' ').slice(1);
+
+    // deeplink to add alert
+    if (args && args[0] == 'credit'){
+        ctx.replyWithHTML(`🦉\nHello! I see that you want me to send you alerts about your API credits.🚨\nThat is really easy. Just type /credit_alert and I will guide you through this.`);
+        return;
+    }
+
     // the group is already registered
     if (configFile.groups[ctx.chat.id]){
         ctx.replyWithHTML(`🦉\nHello <b>${ctx.message.from.first_name}</b>. Welcome to my domain.\nI see you want to know about <b>gas prices</b>.⛽ You came to the right entity. That is my sole purpose.\n\nJust type /gas to summon my wisdom. 🔮`);
@@ -145,6 +153,88 @@ bot.command('gas', (ctx) => {
         
         ctx.replyWithHTML(`🦉\nUse this information wisely. And don't forget to <a href="https://owlracle.info">visit me</a> if you want further knowledge.`);
     }));
+});
+
+
+// create alert
+bot.command('credit_alert', async ctx => {
+    const args = ctx.update.message.text.split(' ').slice(1);
+    const id = ctx.chat.id;
+
+    // send command without api key
+    if (args && args.length == 0){
+        // not registered
+        if (!configFile.credit[id]){
+            ctx.replyWithHTML(`🦉\nLet's do this. To start receiving alerts about your API credits, just tell me your api key by typing <code>/credit_alert add APIKEY</code>.`);
+            return;
+        }
+        
+        // already registed, so check information
+        ctx.replyWithHTML(`🦉\nHey. I know you! I am already commited to inform you about you API credits for the following API keys:`);
+        ctx.replyWithHTML(configFile.credit[id].join('\n'));
+        ctx.replyWithHTML(`If you want to add a key, just type <code>/credit_alert add APIKEY</code> and I will start watching it for you.`);
+        ctx.replyWithHTML(`Or if you need me to stop watching some key, just type <code>/credit_alert remove APIKEY</code>.`);
+        return;
+        
+    }
+
+    if (args && args.length == 2){
+        if (args[0] == 'add'){
+            if (!configFile.credit[id]){
+                configFile.credit[id] = [];
+            }
+
+            // already registered for this key
+            if (configFile.credit[id].includes(args[1])){
+                ctx.replyWithHTML(`🦉\nI am already delivering you alerts for this key. If you want to stop receiving alerts, just type <code>/credit_alert remove ${args[1]}</code>.`);
+                return;
+            }
+            
+            // register key
+            ctx.replyWithHTML(`🦉\nAllright. I will just check if your key is valid...`);
+
+            const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}&source=bot`)).json();
+        
+            if (gas.error) {
+                ctx.replyWithHTML(`🦉\nWell... The request I made using the API key you provided returned an error. Check your key and try again.`);
+                return;
+            }
+        
+            configFile.credit[id].push(args[1]);
+            config.set('telegram', configFile);
+        
+            ctx.replyWithHTML(`🦉\nIt is done! From now on I will keep you informed about your credit usage on this API key.`);
+            ctx.replyWithHTML(`If you want to add a new key, just type <code>/credit_alert add APIKEY</code> again.`);
+            ctx.replyWithHTML(`Or if you need me to stop watching it, just type <code>/credit_alert remove APIKEY</code>.`);
+            
+            alert.send(`A user started receiving alerts: ${id}. Key: ${args[1]}. Total: ${Object.keys(configFile.credit).length}`);
+            return;
+        }
+
+        if (args[0] == 'remove'){
+            if (!configFile.credit[id]){
+                ctx.replyWithHTML(`🦉\nSorry! I don't recall you asking me to watch for this key. But there is no problem, if you want I can do it. Just type <code>/credit_alert add ${args[1]}</code>`);
+                return;
+            }
+
+            configFile.credit[id] = configFile.credit[id].filter(e => e != args[1]);
+            config.set('telegram', configFile);
+    
+            ctx.replyWithHTML(`🦉\nIt is done! I will no longer give you alerts about this key.\nIf you change your mind, you can type <code>/credit_alert add ${args[1]}</code> and I will resume serving you.`);
+    
+            alert.send(`A user stopped receiving alerts: ${id}. Total: ${Object.keys(configFile.credit).length}`);
+            return;
+    
+        }
+
+        // invalid parameter
+        ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. Type /credit_alert and I can guide you through this.`);
+        return;
+    }
+
+    // invalid parameter
+    ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. Type /credit_alert and I can guide you through this.`);
+    return;
 });
 
 
