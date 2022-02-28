@@ -161,31 +161,44 @@ bot.command('credit_alert', async ctx => {
     const args = ctx.update.message.text.split(' ').slice(1);
     const id = ctx.chat.id;
 
+    // invalid parameter
+    if (!args || !(args.length == 0 || args.length == 2) ) {
+        ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. Type /credit_alert and I can guide you through this.`);
+        return;
+    }
+
+    const info = await (await fetch(`https://owlracle.info/alerts/credit/${id}`)).json();
+
+    if (info.status != 'success'){
+        ctx.replyWithHTML(`🦉\nSomething went wrong while retrieving your information from Owlracle server. Try again later or report this error.`);
+        return;
+    }
+
     // send command without api key
-    if (args && args.length == 0){
+    if (args.length == 0){
         // not registered
-        if (!configFile.credit[id]){
+        if (!info.apiKeys.length){
             ctx.replyWithHTML(`🦉\nLet's do this. To start receiving alerts about your API credits, just tell me your api key by typing <code>/credit_alert add APIKEY</code>.`);
             return;
         }
         
         // already registed, so check information
-        ctx.replyWithHTML(`🦉\nHey. I know you! I am already commited to inform you about you API credits for the following API keys:`);
-        ctx.replyWithHTML(configFile.credit[id].join('\n'));
+        ctx.replyWithHTML(`🦉\nHey. I know you! I am already commited to alert you about your API credits for the following API keys:`);
+        
+        info.apiKeys.forEach(e => {
+            ctx.replyWithHTML(`Key: ${e.apiKey}, Credits: $${parseFloat(e.credit).toFixed(4)}`);
+        });
+
         ctx.replyWithHTML(`If you want to add a key, just type <code>/credit_alert add APIKEY</code> and I will start watching it for you.`);
         ctx.replyWithHTML(`Or if you need me to stop watching some key, just type <code>/credit_alert remove APIKEY</code>.`);
+
         return;
-        
     }
 
-    if (args && args.length == 2){
+    if (args.length == 2){
         if (args[0] == 'add'){
-            if (!configFile.credit[id]){
-                configFile.credit[id] = [];
-            }
-
             // already registered for this key
-            if (configFile.credit[id].includes(args[1])){
+            if (info.apiKeys.filter(e => e.apiKey == args[1]).length) {
                 ctx.replyWithHTML(`🦉\nI am already delivering you alerts for this key. If you want to stop receiving alerts, just type <code>/credit_alert remove ${args[1]}</code>.`);
                 return;
             }
@@ -200,29 +213,35 @@ bot.command('credit_alert', async ctx => {
                 return;
             }
         
-            configFile.credit[id].push(args[1]);
-            config.set('telegram', configFile);
+            // add to the db
+            fetch(`https://owlracle.info/alerts/credit/${args[1]}`, {
+                method: 'POST',
+                body: JSON.stringify({ chatid: id }),
+            });
         
             ctx.replyWithHTML(`🦉\nIt is done! From now on I will keep you informed about your credit usage on this API key.`);
             ctx.replyWithHTML(`If you want to add a new key, just type <code>/credit_alert add APIKEY</code> again.`);
             ctx.replyWithHTML(`Or if you need me to stop watching it, just type <code>/credit_alert remove APIKEY</code>.`);
             
-            alert.send(`A user started receiving alerts: ${id}. Key: ${args[1]}. Total: ${Object.keys(configFile.credit).length}`);
+            alert.send(`A user started receiving alerts: ${id}. Key: ${args[1]}.`);
             return;
         }
 
         if (args[0] == 'remove'){
-            if (!configFile.credit[id]){
+            if (!info.apiKeys.filter(e => e.apiKey == args[1]).length){
                 ctx.replyWithHTML(`🦉\nSorry! I don't recall you asking me to watch for this key. But there is no problem, if you want I can do it. Just type <code>/credit_alert add ${args[1]}</code>`);
                 return;
             }
 
-            configFile.credit[id] = configFile.credit[id].filter(e => e != args[1]);
-            config.set('telegram', configFile);
-    
+            // delete from db
+            fetch(`https://owlracle.info/alerts/credit/${args[1]}`, {
+                method: 'DELETE',
+                body: JSON.stringify({ chatid: id }),
+            });
+
             ctx.replyWithHTML(`🦉\nIt is done! I will no longer give you alerts about this key.\nIf you change your mind, you can type <code>/credit_alert add ${args[1]}</code> and I will resume serving you.`);
     
-            alert.send(`A user stopped receiving alerts: ${id}. Total: ${Object.keys(configFile.credit).length}`);
+            alert.send(`A user stopped receiving alerts: ${id}.`);
             return;
     
         }
@@ -231,10 +250,6 @@ bot.command('credit_alert', async ctx => {
         ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. Type /credit_alert and I can guide you through this.`);
         return;
     }
-
-    // invalid parameter
-    ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. Type /credit_alert and I can guide you through this.`);
-    return;
 });
 
 
