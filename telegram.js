@@ -167,7 +167,7 @@ bot.command('credit_alert', async ctx => {
         return;
     }
 
-    const info = await (await fetch(`https://owlracle.info/alerts/credit/${id}`)).json();
+    const info = await (await fetch(`https://owlracle.info/alert/credit/${id}`)).json();
 
     if (info.status != 'success'){
         ctx.replyWithHTML(`🦉\nSomething went wrong while retrieving your information from Owlracle server. Try again later or report this error.`);
@@ -214,7 +214,7 @@ bot.command('credit_alert', async ctx => {
             }
         
             // add to the db
-            fetch(`https://owlracle.info/alerts/credit/${args[1]}`, {
+            fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'POST',
                 body: JSON.stringify({ chatid: id }),
             });
@@ -234,7 +234,7 @@ bot.command('credit_alert', async ctx => {
             }
 
             // delete from db
-            fetch(`https://owlracle.info/alerts/credit/${args[1]}`, {
+            fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'DELETE',
                 body: JSON.stringify({ chatid: id }),
             });
