@@ -217,6 +217,7 @@ bot.command('credit_alert', async ctx => {
             fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'POST',
                 body: JSON.stringify({ chatid: id }),
+                headers: {'Content-type': 'application/json'},
             });
         
             ctx.replyWithHTML(`🦉\nIt is done! From now on I will keep you informed about your credit usage on this API key.`);
@@ -237,6 +238,7 @@ bot.command('credit_alert', async ctx => {
             fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'DELETE',
                 body: JSON.stringify({ chatid: id }),
+                headers: {'Content-type': 'application/json'},
             });
 
             ctx.replyWithHTML(`🦉\nIt is done! I will no longer give you alerts about this key.\nIf you change your mind, you can type <code>/credit_alert add ${args[1]}</code> and I will resume serving you.`);
