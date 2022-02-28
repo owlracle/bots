@@ -186,7 +186,7 @@ bot.command('credit_alert', async ctx => {
         ctx.replyWithHTML(`🦉\nHey. I know you! I am already commited to alert you about your API credits for the following API keys:`);
         
         info.apiKeys.forEach(e => {
-            ctx.replyWithHTML(`Key: ${e.apiKey}, Credits: $${parseFloat(e.credit).toFixed(4)}`);
+            ctx.replyWithHTML(`Key: ...${e.apiKey}, Credits: $${parseFloat(e.credit).toFixed(4)}`);
         });
 
         ctx.replyWithHTML(`If you want to add a key, just type <code>/credit_alert add APIKEY</code> and I will start watching it for you.`);
@@ -197,15 +197,7 @@ bot.command('credit_alert', async ctx => {
 
     if (args.length == 2){
         if (args[0] == 'add'){
-            // already registered for this key
-            if (info.apiKeys.filter(e => e.apiKey == args[1]).length) {
-                ctx.replyWithHTML(`🦉\nI am already delivering you alerts for this key. If you want to stop receiving alerts, just type <code>/credit_alert remove ${args[1]}</code>.`);
-                return;
-            }
-            
             // register key
-            ctx.replyWithHTML(`🦉\nAllright. I will just check if your key is valid...`);
-
             const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}&source=bot`)).json();
         
             if (gas.error) {
@@ -214,11 +206,17 @@ bot.command('credit_alert', async ctx => {
             }
         
             // add to the db
-            fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
+            const data = await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'POST',
                 body: JSON.stringify({ chatid: id }),
                 headers: {'Content-type': 'application/json'},
             });
+
+            // already registered for this key
+            if (data.status == 'existing'){
+                ctx.replyWithHTML(`🦉\nI am already delivering you alerts for this key. If you want to stop receiving alerts, just type <code>/credit_alert remove ${args[1]}</code>.`);
+                return;
+            }
         
             ctx.replyWithHTML(`🦉\nIt is done! From now on I will keep you informed about your credit usage on this API key.`);
             ctx.replyWithHTML(`If you want to add a new key, just type <code>/credit_alert add APIKEY</code> again.`);
@@ -229,17 +227,17 @@ bot.command('credit_alert', async ctx => {
         }
 
         if (args[0] == 'remove'){
-            if (!info.apiKeys.filter(e => e.apiKey == args[1]).length){
-                ctx.replyWithHTML(`🦉\nSorry! I don't recall you asking me to watch for this key. But there is no problem, if you want I can do it. Just type <code>/credit_alert add ${args[1]}</code>`);
-                return;
-            }
-
             // delete from db
-            fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
+            const data = await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'DELETE',
                 body: JSON.stringify({ chatid: id }),
                 headers: {'Content-type': 'application/json'},
             });
+
+            if (data.status != 'success') {
+                ctx.replyWithHTML(`🦉\nSorry! I don't recall you asking me to watch for this key. But there is no problem, if you want I can do it. Just type <code>/credit_alert add ${args[1]}</code>`);
+                return;
+            }
 
             ctx.replyWithHTML(`🦉\nIt is done! I will no longer give you alerts about this key.\nIf you change your mind, you can type <code>/credit_alert add ${args[1]}</code> and I will resume serving you.`);
     
