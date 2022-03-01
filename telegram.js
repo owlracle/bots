@@ -206,11 +206,11 @@ bot.command('credit_alert', async ctx => {
             }
         
             // add to the db
-            const data = await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
+            const data = await (await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'POST',
                 body: JSON.stringify({ chatid: id }),
                 headers: {'Content-type': 'application/json'},
-            });
+            })).json();
 
             // already registered for this key
             if (data.status == 'existing'){
@@ -228,11 +228,11 @@ bot.command('credit_alert', async ctx => {
 
         if (args[0] == 'remove'){
             // delete from db
-            const data = await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
+            const data = await (await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
                 method: 'DELETE',
                 body: JSON.stringify({ chatid: id }),
                 headers: {'Content-type': 'application/json'},
-            });
+            })).json();
 
             if (data.status != 'success') {
                 ctx.replyWithHTML(`🦉\nSorry! I don't recall you asking me to watch for this key. But there is no problem, if you want I can do it. Just type <code>/credit_alert add ${args[1]}</code>`);
@@ -243,7 +243,6 @@ bot.command('credit_alert', async ctx => {
     
             alert.send(`A user stopped receiving alerts: ${id}.`);
             return;
-    
         }
 
         // invalid parameter
