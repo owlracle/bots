@@ -34,6 +34,7 @@ const networkList = {
     one: 'Harmony',
     ht: 'Heco',
     celo: 'Celo',
+    fuse: 'Fuse',
 };
 
 

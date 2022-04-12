@@ -45,6 +45,7 @@ const api = {
         one: [ 'one', 'harmony' ],
         ht: [ 'ht', 'huobi', 'heco' ],
         celo: [ 'celo' ],
+        fuse: [ 'fuse' ],
     },
 
     init: async function() {
