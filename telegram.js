@@ -1,6 +1,5 @@
 const { Telegraf, Markup } = require('telegraf');
-const fetch = require('node-fetch');
-const { networkList, alert, config } = require('./utils.js');
+const { networkList, alert, config, request } = require('./utils.js');
 
 const configFile = config.get('telegram');
 
@@ -76,7 +75,7 @@ bot.command('add', async (ctx) => {
         if (!configFile.groups[args[0]]){
             ctx.replyWithHTML(`🦉\nAllright. I will just check to make sure everything is working as expected...`);
 
-            const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}&source=bot`)).json();
+            const gas = await request(`eth/gas`, { apikey: args[1], source: 'bot' });
 
             if (gas.error) {
                 ctx.replyWithHTML(`🦉\nWell... The request I made using the API key you provided returned an error. Check your key and try again.`);
@@ -138,7 +137,7 @@ bot.command('gas', (ctx) => {
         
         ctx.replyWithHTML(`🦉\n<b>${v}</b>, good choice! One moment while I perform some calculations... 🧠`);
         
-        const gas = await (await fetch(`https://owlracle.info/${k}/gas?apikey=${apiKey}&source=bot`)).json();
+        const gas = await request(`${k}/gas`, { apikey: apiKey, source: 'bot' });
 
         if (gas.error){
             if (gas.status == 401){
@@ -170,7 +169,7 @@ bot.command('credit_alert', async ctx => {
         return;
     }
 
-    const info = await (await fetch(`https://owlracle.info/alert/credit/${id}`)).json();
+    const info = await request(`alert/credit/${id}`);
 
     if (info.status != 'success'){
         ctx.replyWithHTML(`🦉\nSomething went wrong while retrieving your information from Owlracle server. Try again later or report this error.`);
@@ -201,7 +200,7 @@ bot.command('credit_alert', async ctx => {
     if (args.length == 2){
         if (args[0] == 'add'){
             // register key
-            const gas = await (await fetch(`https://owlracle.info/eth/gas?apikey=${args[1]}&source=bot`)).json();
+            const gas = await request(`eth/gas?apikey=${args[1]}&source=bot`);
         
             if (gas.error) {
                 ctx.replyWithHTML(`🦉\nWell... The request I made using the API key you provided returned an error. Check your key and try again.`);
@@ -209,11 +208,7 @@ bot.command('credit_alert', async ctx => {
             }
         
             // add to the db
-            const data = await (await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
-                method: 'POST',
-                body: JSON.stringify({ chatid: id }),
-                headers: {'Content-type': 'application/json'},
-            })).json();
+            const data = await request(`alert/credit/${args[1]}`, { chatid: id }, 'POST');
 
             // already registered for this key
             if (data.status == 'existing'){
@@ -231,11 +226,7 @@ bot.command('credit_alert', async ctx => {
 
         if (args[0] == 'remove'){
             // delete from db
-            const data = await (await fetch(`https://owlracle.info/alert/credit/${args[1]}`, {
-                method: 'DELETE',
-                body: JSON.stringify({ chatid: id }),
-                headers: {'Content-type': 'application/json'},
-            })).json();
+            const data = await request(`alert/credit/${args[1]}`, { chatid: id }, 'DELETE');
 
             if (data.status != 'success') {
                 ctx.replyWithHTML(`🦉\nSorry! I don't recall you asking me to watch for this key. But there is no problem, if you want I can do it. Just type <code>/credit_alert add ${args[1]}</code>`);
