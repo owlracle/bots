@@ -19,11 +19,14 @@ const buttons = Markup.inlineKeyboard([
 const bot = new Telegraf(configFile.token);
 
 // when user type /start
-bot.start((ctx) => {
-    let args = ctx.update.message.text.split(' ').slice(1);
+bot.start(async ctx => {
+    let args = ctx.update.message.text.split(' ');
+    if (args && args[0] == '/start'){
+        args = Buffer.from(args[1], 'base64').split(' ');
+    }
 
     // deeplink to add alert
-    if (args && args[0] == 'credit'){
+    if (args[0] == 'credit'){
         ctx.replyWithHTML(`🦉\nHello! I see that you want me to send you alerts about your API credits.🚨\nThat is really easy. Just type /credit_alert and I will guide you through this.`);
         return;
     }
