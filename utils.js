@@ -90,4 +90,46 @@ const logError = (data) => {
 }
 
 
-module.exports = { networkList, alert, config, logError };
+// encapsulate fetch requests
+const request = async (url, args={}, method='GET') => {
+    if (!url) {
+        return {
+            error: true,
+            message: 'URL not provided or invalid',
+        };
+    }
+
+    const baseURL = config.get('requestURL');
+
+    if (method == 'GET') {
+        const query = new URLSearchParams(args).toString() || '';
+        try {
+            const req = await fetch(`${baseURL}/${url}?${query}`);
+            return await req.json();
+        }
+        catch(error) {
+            return {
+                error: true,
+                message: error,
+            };
+        }
+    }
+
+    try {
+        const req = await fetch(`${baseURL}/${url}`, {
+            method: method || 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify(args) || null,
+        });
+        return await req.json();
+    }
+    catch(error) {
+        return {
+            error: true,
+            message: error,
+        };
+    }
+} 
+
+
+module.exports = { networkList, alert, config, logError, request };
