@@ -21,12 +21,34 @@ const bot = new Telegraf(configFile.token);
 bot.start(async ctx => {
     let args = ctx.update.message.text.split(' ');
     if (args && args[0] == '/start'){
-        args = Buffer.from(args[1], 'base64').split(' ');
+        // decode arguments and split in an array
+        args = args[1] ? Buffer.from(args[1], 'base64').toString().split(' ') : [];
     }
 
     // deeplink to add alert
     if (args[0] == 'credit'){
         ctx.replyWithHTML(`🦉\nHello! I see that you want me to send you alerts about your API credits.🚨\nThat is really easy. Just type /credit_alert and I will guide you through this.`);
+        return;
+    }
+
+    if (args[0] == 'auth' && args[1]){
+        const key = args[1];
+        ctx.replyWithHTML(`🦉\nHello. Nice to meet you!\nI will try to bind your API with your Telegram user. Let me check your key info first...`);
+        const keyInfo = await request(`keys/${key}`);
+
+        if (keyInfo.chatid) {
+            ctx.replyWithHTML(`I reckon that we already had this conversation, because I remember your API key.\n If you want me to forget it just go to <a href="https://owlracle.info/?action=editkey">Owlracle website</a> and revoke my permission.`);
+            return;
+        }
+
+        const data = await request(`authbot/${key}`, { chatid: ctx.chat.id }, 'POST');
+        
+        if (data.error) {
+            ctx.replyWithHTML(`🦉\nI am sorry. Something went wrong!`);
+            return;    
+        }
+        
+        ctx.replyWithHTML(`🦉\nIt is done! I am glad you let me get to know you a little better.`);
         return;
     }
 
