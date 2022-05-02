@@ -25,19 +25,13 @@ bot.start(async ctx => {
         args = args[1] ? Buffer.from(args[1], 'base64').toString().split(' ') : [];
     }
 
-    // deeplink to add alert
-    if (args[0] == 'credit'){
-        ctx.replyWithHTML(`🦉\nHello! I see that you want me to send you alerts about your API credits.🚨\nThat is really easy. Just type /credit_alert and I will guide you through this.`);
-        return;
-    }
-
     if (args[0] == 'auth' && args[1]){
         const key = args[1];
         ctx.replyWithHTML(`🦉\nHello. Nice to meet you!\nI will try to bind your API with your Telegram user. Let me check your key info first...`);
         const keyInfo = await request(`keys/${key}`);
 
         if (keyInfo.chatid) {
-            ctx.replyWithHTML(`I reckon that we already had this conversation, because I remember your API key.\n If you want me to forget it just go to <a href="https://owlracle.info/?action=editkey">Owlracle website</a> and revoke my permission.`);
+            ctx.replyWithHTML(`I reckon that we already had this conversation, because I remember your API key.\n If you want me to forget it just go to <a href="https://owlracle.info/?action=alerts&apikey=${key}">Owlracle website</a>.`);
             return;
         }
 
@@ -48,7 +42,7 @@ bot.start(async ctx => {
             return;    
         }
         
-        ctx.replyWithHTML(`🦉\nIt is done! I am glad you let me get to know you a little better.`);
+        ctx.replyWithHTML(`🦉\nIt is done! I am glad you let me get to know you a little better. You can now return to <a href="https://owlracle.info/?action=alerts&apikey=${key}">Owlracle</a>.`);
         return;
     }
 
@@ -177,94 +171,6 @@ bot.command('gas', (ctx) => {
         
         ctx.replyWithHTML(`🦉\nUse this information wisely. And don't forget to <a href="https://owlracle.info">visit me</a> if you want further knowledge.`);
     }));
-});
-
-
-// create alert
-bot.command('credit_alert', async ctx => {
-    const args = ctx.update.message.text.split(' ').slice(1);
-    const id = ctx.chat.id;
-
-    // invalid parameter
-    if (!args || !(args.length == 0 || args.length == 2) ) {
-        ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. Type /credit_alert and I can guide you through this.`);
-        return;
-    }
-
-    const info = await request(`alert/credit/${id}`);
-
-    if (info.status != 'success'){
-        ctx.replyWithHTML(`🦉\nSomething went wrong while retrieving your information from Owlracle server. Try again later or report this error.`);
-        return;
-    }
-
-    // send command without api key
-    if (args.length == 0){
-        // not registered
-        if (!info.apiKeys.length){
-            ctx.replyWithHTML(`🦉\nLet's do this. To start receiving alerts about your API credits, just tell me your api key by typing <code>/credit_alert add APIKEY</code>.`);
-            return;
-        }
-        
-        // already registed, so check information
-        ctx.replyWithHTML(`🦉\nHey. I know you! I am already commited to alert you about your API credits for the following API keys:`);
-        
-        info.apiKeys.forEach(e => {
-            ctx.replyWithHTML(`Key: ...${e.apiKey}, Credits: $${parseFloat(e.credit).toFixed(4)}`);
-        });
-
-        ctx.replyWithHTML(`If you want to add a key, just type <code>/credit_alert add APIKEY</code> and I will start watching it for you.`);
-        ctx.replyWithHTML(`Or if you need me to stop watching some key, just type <code>/credit_alert remove APIKEY</code>.`);
-
-        return;
-    }
-
-    if (args.length == 2){
-        if (args[0] == 'add'){
-            // register key
-            const gas = await request(`eth/gas?apikey=${args[1]}&source=bot`);
-        
-            if (gas.error) {
-                ctx.replyWithHTML(`🦉\nWell... The request I made using the API key you provided returned an error. Check your key and try again.`);
-                return;
-            }
-        
-            // add to the db
-            const data = await request(`alert/credit/${args[1]}`, { chatid: id }, 'POST');
-
-            // already registered for this key
-            if (data.status == 'existing'){
-                ctx.replyWithHTML(`🦉\nI am already delivering you alerts for this key. If you want to stop receiving alerts, just type <code>/credit_alert remove ${args[1]}</code>.`);
-                return;
-            }
-        
-            ctx.replyWithHTML(`🦉\nIt is done! From now on I will keep you informed about your credit usage on this API key.`);
-            ctx.replyWithHTML(`If you want to add a new key, just type <code>/credit_alert add APIKEY</code> again.`);
-            ctx.replyWithHTML(`Or if you need me to stop watching it, just type <code>/credit_alert remove APIKEY</code>.`);
-            
-            alert.send(`A user started receiving alerts: ${id}. Key: ${args[1]}.`);
-            return;
-        }
-
-        if (args[0] == 'remove'){
-            // delete from db
-            const data = await request(`alert/credit/${args[1]}`, { chatid: id }, 'DELETE');
-
-            if (data.status != 'success') {
-                ctx.replyWithHTML(`🦉\nSorry! I don't recall you asking me to watch for this key. But there is no problem, if you want I can do it. Just type <code>/credit_alert add ${args[1]}</code>`);
-                return;
-            }
-
-            ctx.replyWithHTML(`🦉\nIt is done! I will no longer give you alerts about this key.\nIf you change your mind, you can type <code>/credit_alert add ${args[1]}</code> and I will resume serving you.`);
-    
-            alert.send(`A user stopped receiving alerts: ${id}.`);
-            return;
-        }
-
-        // invalid parameter
-        ctx.replyWithHTML(`🦉\nSorry! I cannot recognize what you are asking me. Type /credit_alert and I can guide you through this.`);
-        return;
-    }
 });
 
 
