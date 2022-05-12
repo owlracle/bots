@@ -56,11 +56,12 @@ const api = {
             accessSecret: configFile.accessSecret,
         });
 
-        const mainRule = `@${this.botName} #gas`;
+        const gasKW = `("gas price" OR "gas prices" OR #gas OR #GasPrice OR #gasprices)`;
+        const mainRule = `@${this.botName} ${gasKW}`;
         let newRule = mainRule;
         if (args.aggressive) {
             const aliases = Object.values(this.networkAlias).map(n => n.map(a => `"${a}"`).join(' OR ')).join(' OR ');
-            newRule = `-from:${this.botName} ("gas price" OR "gas prices" OR #gas OR #GasPrice OR #gasprices) (${aliases})`;
+            newRule = `-from:${this.botName} ${gasGW} (${aliases})`;
         }
         if (args.rebuildRules) {
             newRule = args.rebuildRules;
