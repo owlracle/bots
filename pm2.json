@@ -1,17 +1,17 @@
 {
     "apps" : [
         {
-            "name"        : "telegram_bot",
+            "name"        : "bot_telegram",
             "script"      : "./telegram.js",
             "args"        : ""
         },
         {
-            "name"        : "discord_bot",
+            "name"        : "bot_discord",
             "script"      : "./discord.js",
             "args"        : ""
         },
         {
-            "name"        : "twitter_bot",
+            "name"        : "bot_twitter",
             "script"      : "./twitter.js",
             "args"        : ""
         }
