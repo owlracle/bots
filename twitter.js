@@ -13,7 +13,7 @@ const args = {
 process.argv.forEach((val, index, array) => {
     // aggressive mode = do not require mention
     if ((val == '-a' || val == '--aggressive')){
-        console.log('Aggressive mode - Bot will not care about mention and hashtag when searching for tweets.')
+        console.log('Aggressive mode - Bot will not care about mention when searching for tweets.')
         args.aggressive = true;
     }
     // rebuild rules
@@ -35,17 +35,17 @@ const api = {
     },
 
     networkAlias: {
-        bsc: [ 'bnb', 'bsc', 'binance' ],
-        poly: [ 'matic', 'poly', 'polygon' ],
+        bsc: [ 'bnb chain', 'bsc', 'binance' ],
+        poly: [ 'matic', 'polygon' ],
         ftm: [ 'ftm', 'fantom' ],
         eth: [ 'eth', 'ethereum' ],
         avax: [ 'avax', 'avalanche' ],
-        cro: [ 'cro', 'cronos' ],
-        movr: [ 'movr', 'moonriver' ],
-        one: [ 'one', 'harmony' ],
-        ht: [ 'ht', 'huobi', 'heco' ],
-        celo: [ 'celo' ],
-        fuse: [ 'fuse' ],
+        // cro: [ 'cro', 'cronos' ],
+        // movr: [ 'movr', 'moonriver' ],
+        // one: [ 'one', 'harmony' ],
+        // ht: [ 'ht', 'huobi', 'heco' ],
+        // celo: [ 'celo' ],
+        // fuse: [ 'fuse' ],
     },
 
     init: async function() {
@@ -56,28 +56,29 @@ const api = {
             accessSecret: configFile.accessSecret,
         });
 
-        const gasKW = `("gas price" OR "gas prices" OR #gas OR #GasPrice OR #gasprices)`;
-        const mainRule = `@${this.botName} ${gasKW}`;
-        let newRule = mainRule;
-        if (args.aggressive) {
-            const aliases = Object.values(this.networkAlias).map(n => n.map(a => `"${a}"`).join(' OR ')).join(' OR ');
-            newRule = `-from:${this.botName} ${gasGW} (${aliases})`;
-        }
-        if (args.rebuildRules) {
-            newRule = args.rebuildRules;
-        }
-
         this.blacklist = configFile.blacklist || [];
-        newRule += ' ' + this.blacklist.map(e => `-from:${e}`).join(' ');
-        
-        const rulesObj = await this.rules.get();
-        
-        if (rulesObj.data[0].value != newRule){
-            console.log('Updating rules');
-            await this.rules.clear();
-            await this.rules.add(newRule);
-            await this.rules.add(mainRule);
-        }
+        const rules = [];
+
+        const mainRule = (() => {
+            const gasKW = `"gas price" OR "gas prices" OR "gas fee" OR "gas fees" OR #gas OR #GasPrice`;
+
+            let botStr = '';
+            if (!args.aggressive) {
+                botStr = `@${ this.botName }`;
+            }
+            // pieces.push(`(${ blackList })`);
+
+            const network = Object.values(this.networkAlias).reduce((p,c) => [ ...p, ...c ], []).map(e => `"${e}"`).join(' OR ');
+            
+            return [ `${ botStr } (${ gasKW }) (${ network })` ];
+        })();
+
+        // console.log(mainRule)
+        rules.push(...mainRule);
+
+        console.log('Updating rules');
+        await this.rules.clear();
+        await Promise.all( rules.map(r => this.rules.add(r)) );
 
         console.log(await this.rules.get());
         await this.scan();
@@ -121,8 +122,32 @@ const api = {
         },
     },
 
+    userCooldown: function(user) {
+        const time = 60 * 60 * 1000; // 1 hour
+
+        if (!this.cooldown) {
+            this.cooldown = {};
+        }
+
+        if (!this.cooldown[user]) {
+            this.cooldown[user] = new Date().getTime();
+            return true;
+        }
+
+        const elapsed = new Date().getTime() - this.cooldown[user];
+        if (elapsed > time) {
+            this.cooldown[user] = new Date().getTime();
+            return true;
+        }
+
+        logError({ message: 'User on cooldown', alert: false });
+        return false;
+    },
+
     scan: async function() {
-        const stream = await fetch(`https://api.twitter.com/2/tweets/search/stream`, {
+        const args = [ 'author_id',  'reply_settings', 'in_reply_to_user_id' ];
+
+        const stream = await fetch(`https://api.twitter.com/2/tweets/search/stream?tweet.fields=${ args.join(',') }`, {
             headers: { 'Authorization': `Bearer ${configFile.bearer}` },
         });
 
@@ -141,7 +166,21 @@ const api = {
             try {
                 const data = JSON.parse(chunk);
 
-                // logError({ message: 'Got a new tweet', tweet: chunk, alert: false });
+                // return if I cannot reply to this tweet.
+                if (data.data.reply_settings != 'everyone') {
+                    return;
+                }
+                // do not reply if user is in the blacklist
+                if (this.blacklist.includes(data.data.author_id)) {
+                    return;
+                }
+
+                // check for user cooldown (avoid spam)
+                if (!this.userCooldown(data.data.author_id) || (data.data.in_reply_to_user_id && !this.userCooldown(data.data.in_reply_to_user_id))) {
+                    return;
+                }
+
+                logError({ message: 'Got a new tweet', tweet: chunk, alert: false });
 
                 const tweet = data.data.text.toLowerCase();
                 const tweetId = data.data.id;
@@ -154,13 +193,14 @@ const api = {
 
                 const gas = await this.getGas(network);
                 if (!gas) {
+                    logError({ message: 'Not gas', gas: gas, network: network, alert: false });
                     return;
                 }
                 gas.network = network;
                 this.sendMessage(tweetId, gas);
             }
             catch (error) {
-                logError({ message: 'Error parsing the json', alert: false });
+                // logError({ message: 'Error parsing the json', alert: false });
                 // console.log(chunk);
             }
         })

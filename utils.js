@@ -77,7 +77,10 @@ const logError = (data) => {
         delete data.alert;
         delete data.console;
 
-        const log = JSON.parse(fs.readFileSync(`${__dirname}/log.json`));
+        let log = [];
+        if (fs.existsSync(`${__dirname}/log.json`)) {
+            log = JSON.parse(fs.readFileSync(`${__dirname}/log.json`));
+        }
         log.push(data);
         fs.writeFileSync(`${__dirname}/log.json`, JSON.stringify(log));
 
