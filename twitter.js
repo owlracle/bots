@@ -145,7 +145,7 @@ const api = {
     },
 
     scan: async function() {
-        const args = [ 'author_id',  'reply_settings', 'in_reply_to_user_id' ];
+        const args = [ 'author_id',  'reply_settings', 'in_reply_to_user_id', 'referenced_tweets' ];
 
         const stream = await fetch(`https://api.twitter.com/2/tweets/search/stream?tweet.fields=${ args.join(',') }`, {
             headers: { 'Authorization': `Bearer ${configFile.bearer}` },
@@ -177,6 +177,11 @@ const api = {
 
                 // check for user cooldown (avoid spam)
                 if (!this.userCooldown(data.data.author_id) || (data.data.in_reply_to_user_id && !this.userCooldown(data.data.in_reply_to_user_id))) {
+                    return;
+                }
+
+                // do not reply if its a retweet (spam the original tweet)
+                if (data.data.referenced_tweets[0].type == 'retweeted') {
                     return;
                 }
 
