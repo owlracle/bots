@@ -95,6 +95,7 @@ const logError = (data) => {
 
 // encapsulate fetch requests
 const request = async (url, args={}, method='GET') => {
+    const version = args.version || 'v4';
     if (!url) {
         return {
             error: true,
@@ -107,7 +108,7 @@ const request = async (url, args={}, method='GET') => {
     if (method == 'GET') {
         const query = new URLSearchParams(args).toString() || '';
         try {
-            const req = await fetch(`${baseURL}/${url}?${query}`);
+            const req = await fetch(`${baseURL}/${version}/${url}?${query}`);
             return await req.json();
         }
         catch(error) {

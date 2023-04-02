@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { config, logError, networkList } = require('./utils.js');
+const { config, logError, networkList, request } = require('./utils.js');
 const { TwitterApi } = require('twitter-api-v2');
 
 const configFile = config.get('twitter');
@@ -227,7 +227,7 @@ const api = {
     getGas: async function(network) {
         const apiKey = configFile.owlracleKey;
 
-        const gas = await (await fetch(`https://owlracle.info/${network}/gas?apikey=${apiKey}&source=bot`)).json();
+        const gas = await request(`${network}/gas?apikey=${apiKey}&source=bot`);
 
         if (gas.error){
             logError({ message: 'Error retrieving gas', error: gas, apiKey: apiKey, network: network });

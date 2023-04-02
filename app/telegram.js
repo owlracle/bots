@@ -35,7 +35,7 @@ bot.start(async ctx => {
             return;
         }
 
-        const data = await request(`authbot/${key}`, { chatid: ctx.chat.id }, 'POST');
+        const data = await request(`alerts/bot/${key}`, { chatid: ctx.chat.id }, 'POST');
         
         if (data.error) {
             ctx.replyWithHTML(`🦉\nI am sorry. Something went wrong!`);
