@@ -170,11 +170,18 @@ client.on('interactionCreate', async itr => {
 
     // put information inside the card and update the reply
     const speeds = ['🛴 Slow', '🚗 Standard', '✈️ Fast', '🚀 Instant'];
-    templateEmbed.fields = speeds.map((e,i) => { return { 
-        inline: true,
-        name: e,
-        value: `\n**${gas.speeds[i].gasPrice.toFixed(2)}** GWei\n$ **${gas.speeds[i].estimatedFee.toFixed(4)}**`,
-    }});
+    templateEmbed.fields = speeds.map((e,i) => { 
+        let gasPrice = gas.speeds[i].gasPrice;
+        if (gas.speeds[i].maxFeePerGas) {
+            gasPrice = gas.speeds[i].maxFeePerGas;
+        }
+
+        return { 
+            inline: true,
+            name: e,
+            value: `\n**${gasPrice.toFixed(2)}** GWei\n$ **${gas.speeds[i].estimatedFee.toFixed(4)}**`,
+        }
+    });
 
     const blankComponenet = { name: '\u200b', value: '\u200b', inline: true };
     templateEmbed.fields = [templateEmbed.fields[0], blankComponenet, ...templateEmbed.fields.slice(1,3), blankComponenet, templateEmbed.fields.slice(-1)];

@@ -154,6 +154,7 @@ bot.command('gas', (ctx) => {
         ctx.replyWithHTML(`🦉\n<b>${v}</b>, good choice! One moment while I perform some calculations... 🧠`);
         
         const gas = await request(`${k}/gas`, { apikey: apiKey, source: 'bot' });
+        // console.log(gas)
 
         if (gas.error){
             if (gas.status == 401){
@@ -167,7 +168,15 @@ bot.command('gas', (ctx) => {
         await ctx.replyWithHTML(`🦉\nI think you should pay no more than this when submitting transactions on the <b>${v}</b> network:`);
         
         const speeds = ['🛴 Slow', '🚗 Standard', '✈️ Fast', '🚀 Instant'];
-        await Promise.all(speeds.map((e,i) => ctx.replyWithHTML(`\n<b>${e}</b>\n\n<b>${gas.speeds[i].gasPrice.toFixed(2)}</b> GWei\n$ <b>${gas.speeds[i].estimatedFee.toFixed(4)}</b>\n\n`)));
+        await Promise.all(speeds.map((e,i) => {
+            let gasPrice = gas.speeds[i].gasPrice;
+            
+            if (gas.speeds[i].maxFeePerGas) {
+                gasPrice = gas.speeds[i].maxFeePerGas;
+            }
+
+            return ctx.replyWithHTML(`\n<b>${e}</b>\n\n<b>${gasPrice.toFixed(2)}</b> GWei\n$ <b>${gas.speeds[i].estimatedFee.toFixed(4)}</b>\n\n`)
+        }));
         
         ctx.replyWithHTML(`🦉\nUse this information wisely. And don't forget to <a href="https://owlracle.info">visit me</a> if you want further knowledge.`);
     }));
